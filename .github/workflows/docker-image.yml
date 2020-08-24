@@ -4,13 +4,43 @@ on:
   push:
     branches: [ master ]
 
+env:
+  TARGET: nextcloud_backup
+  image: "{arch}-hassio-nextcloud-backup"
+  repository: sebclemhassaddon
+
+
 jobs:
 
   build:
 
     runs-on: ubuntu-latest
-
+    env:
+      build_arch: armv7
     steps:
     - uses: actions/checkout@v2
-    - name: Build the Docker image
-      run: docker run -rm --privileged hassioaddons/qemu-user-static:latest
+    - name: Add Qemu-user-static
+      run: docker run --rm --privileged hassioaddons/qemu-user-static:latest
+    - name: Get build option
+      run: |
+        echo ::set-env name=build_from::"homeassistant/armv7-base:latest"
+        echo ::set-env name=name::"$(jq --raw-output '.name // empty' "$TARGET/config.json" | sed "s/'//g")"
+        echo ::set-env name=description::"$(jq --raw-output '.description // empty' "$TARGET/config.json" | sed "s/'//g")"
+        echo ::set-env name=url::"$(jq --raw-output '.url // empty' "$TARGET/config.json")"
+        echo ::set-env name=version::"$(jq --raw-output '.version' "$TARGET/config.json")"
+        echo ${{env.image}}
+        echo ::set-env name=image::"$(echo "${{env.image}}" | sed -r "s/\{arch\}/$build_arch/g")"
+        echo ${{env.image}}
+        printenv
+        
+    # - name: Build and push armv7
+    #   uses: docker/build-push-action@v1
+    #   with:
+    #     username: ${{ secrets.DOCKER_USERNAME }}
+    #     password: ${{ secrets.DOCKER_PASSWORD }}
+    #     repository: ${{env.repository}}/armv7-${{env.image}}
+    #     tags: latest, ${{env.version}}
+    #     labels: io.hass.name=${{env.name}}, io.hass.description=${{env.description}}, io.hass.url=${{url}},io.hass.type=addon
+
+
+    
