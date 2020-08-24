@@ -26,7 +26,7 @@ jobs:
     - name: Set Version
       run: |
         version=${GITHUB_REF/refs\/tags\//}
-        if [-n "$version"];then
+        if [ -n "$version" ];then
           jq '.version="$version"' ${{env.TARGET}}/config.json |  sponge ${{env.TARGET}}/config.json
         fi
     - name: Get build option armv7
