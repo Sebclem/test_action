@@ -38,9 +38,9 @@ jobs:
         echo ::set-env name=IMAGE::"$(echo "${{env.IMAGE}}" | sed -r "s/\{arch\}/${{env.BUILD_ARCH}}/g")"
         echo ::set-env name=BUILD_FROM::"homeassistant/${{env.BUILD_ARCH}}-base:latest"
         if [ "${{env.VERSION}}" != "dev" ]; then
-          echo ::set-env name=TAGS::"latest, ${{env.VERSION}}"
+          echo ::set-env name=TAGS::"latest, $(jq --raw-output '.version' "${{env.TARGET}}/config.json")"
         else
-          echo ::set-env name=TAGS::"${{env.VERSION}}"
+          echo ::set-env name=TAGS::"$(jq --raw-output '.version' "${{env.TARGET}}/config.json")"
         fi
     - name: Debug Env
       run: |
