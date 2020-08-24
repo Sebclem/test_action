@@ -24,6 +24,7 @@ jobs:
     - name: Add Qemu-user-static
       run: docker run --rm --privileged hassioaddons/qemu-user-static:latest
     - name: Set Version
+      if: github.event_name != workflow_dispatch
       run: |
         version=${GITHUB_REF/refs\/tags\//}
         if [ -n "$version" ];then
