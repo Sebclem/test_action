@@ -25,7 +25,6 @@ jobs:
       run: docker run --rm --privileged hassioaddons/qemu-user-static:latest
     - name: Set Version
       run: |
-        # jq '.version="${{}}"' "$TARGET/config.json" | sponge "$TARGET/config.json"
         echo ${GITHUB_REF/refs\/tags\//}
         echo ${GITHUB_REF}
     - name: Get build option armv7
