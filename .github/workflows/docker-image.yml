@@ -37,17 +37,23 @@ jobs:
         echo ::set-env name=VERSION::"$(jq --raw-output '.version' "${{env.TARGET}}/config.json")"
         echo ::set-env name=IMAGE::"$(echo "${{env.IMAGE}}" | sed -r "s/\{arch\}/${{env.BUILD_ARCH}}/g")"
         echo ::set-env name=BUILD_FROM::"homeassistant/${{env.BUILD_ARCH}}-base:latest"
+        if [ "${{env.VERSION}}" != "dev" ]; then
+          echo ::set-env name=TAGS::"latest, ${{env.VERSION}}"
+        else
+          echo ::set-env name=TAGS::"${{env.VERSION}}"
+        fi
     - name: Debug Env
       run: |
         echo ${{env.IMAGE}}
         echo ${{env.VERSION}}
+        echo ${{env.TAGS}}
     - name: Build and push armv7
       uses: docker/build-push-action@v1
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
         repository: ${{env.REPOSITORY}}/${{env.IMAGE}}
-        tags: latest, ${{env.VERSION}}
+        tags: ${{env.TAGS}}
         labels: io.hass.name=${{env.NAME}}, io.hass.description=${{env.DESCRIPTION}}, io.hass.url=${{env.URL}}, io.hass.arch=${{env.BUILD_ARCH}}, io.hass.version=${{env.VERSION}}, io.hass.type=addon
         build_args: BUILD_FROM=${{env.BUILD_FROM}}, BUILD_VERSION=${{env.VERSION}}
         path: ./${{env.TARGET}}
