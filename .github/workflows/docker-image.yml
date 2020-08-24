@@ -27,8 +27,7 @@ jobs:
         version=${GITHUB_REF/refs\/tags\//}
         if [ -n "$version" ];then
           tmp=$(mktemp)
-          jq --arg version "$version" '.version="$version"' ${{env.TARGET}}/config.json
-          jq --arg version "$version" '.version="$version"' ${{env.TARGET}}/config.json > "$tmp" && mv "$tmp" ${{env.TARGET}}/config.json
+          jq --arg version "$version" '.version=$version' ${{env.TARGET}}/config.json > "$tmp" && mv "$tmp" ${{env.TARGET}}/config.json
         fi
     - name: Get build option armv7
       run: |
