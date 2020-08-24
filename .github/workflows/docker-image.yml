@@ -25,10 +25,11 @@ jobs:
     - name: Set Version
       run: |
         version=${GITHUB_REF/refs\/tags\//}
+        echo $version
         if [ -n "$version" ];then
           tmp=$(mktemp)
-          jq '.version="$version"' ${{env.TARGET}}/config.json
-          jq '.version="$version"' ${{env.TARGET}}/config.json > "$tmp" && mv "$tmp" ${{env.TARGET}}/config.json
+          jq '.version="${version}"' ${{env.TARGET}}/config.json
+          jq '.version="${version}"' ${{env.TARGET}}/config.json > "$tmp" && mv "$tmp" ${{env.TARGET}}/config.json
         fi
     - name: Get build option armv7
       run: |
