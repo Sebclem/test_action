@@ -1,13 +1,15 @@
 name: Docker Image CI
 
 on:
-  push:
-    branches: [ master ]
+  release:
+    types: [published]
 
 env:
   TARGET: nextcloud_backup
-  image: "{arch}-hassio-nextcloud-backup"
-  repository: sebclemhassaddon
+  # IMAGE: "{arch}-hassio-nextcloud-backup"
+  IMAGE: test-{arch}
+  # REPOSITORY: sebclemhassaddon
+  REPOSITORY: brokenfire
 
 
 jobs:
@@ -16,31 +18,38 @@ jobs:
 
     runs-on: ubuntu-latest
     env:
-      build_arch: armv7
+      BUILD_ARCH: armv7
     steps:
     - uses: actions/checkout@v2
     - name: Add Qemu-user-static
       run: docker run --rm --privileged hassioaddons/qemu-user-static:latest
-    - name: Get build option
+    - name: Set Version
+      if: ${GITHUB_REF/refs\/tags\//}
       run: |
-        echo ::set-env name=build_from::"homeassistant/armv7-base:latest"
-        echo ::set-env name=name::"$(jq --raw-output '.name // empty' "$TARGET/config.json" | sed "s/'//g")"
-        echo ::set-env name=description::"$(jq --raw-output '.description // empty' "$TARGET/config.json" | sed "s/'//g")"
-        echo ::set-env name=url::"$(jq --raw-output '.url // empty' "$TARGET/config.json")"
-        echo ::set-env name=version::"$(jq --raw-output '.version' "$TARGET/config.json")"
-        echo ${{env.image}}
-        echo ::set-env name=image::"$(echo "${{env.image}}" | sed -r "s/\{arch\}/$build_arch/g")"
-        echo ${{env.image}}
-        printenv
-        
-    # - name: Build and push armv7
-    #   uses: docker/build-push-action@v1
-    #   with:
-    #     username: ${{ secrets.DOCKER_USERNAME }}
-    #     password: ${{ secrets.DOCKER_PASSWORD }}
-    #     repository: ${{env.repository}}/armv7-${{env.image}}
-    #     tags: latest, ${{env.version}}
-    #     labels: io.hass.name=${{env.name}}, io.hass.description=${{env.description}}, io.hass.url=${{url}},io.hass.type=addon
+        # jq '.version="${{}}"' "$TARGET/config.json" | sponge "$TARGET/config.json"
+        echo NOPE
+    - name: Get build option armv7
+      run: |
+        echo ::set-env name=NAME::"$(jq --raw-output '.name // empty' "$TARGET/config.json" | sed "s/'//g")"
+        echo ::set-env name=DESCRIPTION::"$(jq --raw-output '.description // empty' "$TARGET/config.json" | sed "s/'//g")"
+        echo ::set-env name=URL::"$(jq --raw-output '.url // empty' "$TARGET/config.json")"
+        echo ::set-env name=VERSION::"$(jq --raw-output '.version' "$TARGET/config.json")"
+        echo ::set-env name=IMAGE::"$(echo "${{env.IMAGE}}" | sed -r "s/\{arch\}/${{env.BUILD_ARCH}}/g")"
+        echo ::set-env name=BUILD_FROM::"homeassistant/${{env.BUILD_ARCH}}-base:latest"
+    - name: Debug Env
+      run: |
+        echo ${{env.IMAGE}}
+        echo ${{env.VERSION}}
+    - name: Build and push armv7
+      uses: docker/build-push-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        repository: ${{env.REPOSITORY}}/${{env.IMAGE}}
+        tags: latest, ${{env.VERSION}}
+        labels: io.hass.name=${{env.NAME}}, io.hass.description=${{env.DESCRIPTION}}, io.hass.url=${{env.URL}}, io.hass.arch=${{env.BUILD_ARCH}}, io.hass.version=${{env.VERSION}}, io.hass.type=addon
+        build_args: BUILD_FROM=${{env.BUILD_FROM}}, BUILD_VERSION=${{env.VERSION}}
+        path: ./${{env.TARGET}}
 
 
     
