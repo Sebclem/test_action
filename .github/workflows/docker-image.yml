@@ -27,7 +27,8 @@ jobs:
       if: ${GITHUB_REF/refs\/tags\//}
       run: |
         # jq '.version="${{}}"' "$TARGET/config.json" | sponge "$TARGET/config.json"
-        echo NOPE
+        echo ${GITHUB_REF/refs\/tags\//}
+        echo ${GITHUB_REF}
     - name: Get build option armv7
       run: |
         echo ::set-env name=NAME::"$(jq --raw-output '.name // empty' "$TARGET/config.json" | sed "s/'//g")"
