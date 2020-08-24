@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Build addon
 
 on:
   release:
@@ -14,11 +14,10 @@ env:
 
 
 jobs:
-
-  build:
+  armhf:
     runs-on: ubuntu-latest
     env:
-      BUILD_ARCH: armv7
+      BUILD_ARCH: armhf
     steps:
     - uses: actions/checkout@v2
     - name: Add Qemu-user-static
@@ -31,7 +30,7 @@ jobs:
           tmp=$(mktemp)
           jq --arg version "$version" '.version=$version' ${{env.TARGET}}/config.json > "$tmp" && mv "$tmp" ${{env.TARGET}}/config.json
         fi
-    - name: Get build option armv7
+    - name: Get build option ${{env.BUILD_ARCH}}
       run: |
         echo ::set-env name=NAME::"$(jq --raw-output '.name // empty' "${{env.TARGET}}/config.json" | sed "s/'//g")"
         echo ::set-env name=DESCRIPTION::"$(jq --raw-output '.description // empty' "${{env.TARGET}}/config.json" | sed "s/'//g")"
@@ -49,7 +48,52 @@ jobs:
         echo ${{env.IMAGE}}
         echo ${{env.VERSION}}
         echo ${{env.TAGS}}
-    - name: Build and push armv7
+    - name: Build and push ${{env.BUILD_ARCH}}
+      uses: docker/build-push-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        repository: ${{env.REPOSITORY}}/${{env.IMAGE}}
+        tags: ${{env.TAGS}}
+        labels: io.hass.name=${{env.NAME}}, io.hass.description=${{env.DESCRIPTION}}, io.hass.url=${{env.URL}}, io.hass.arch=${{env.BUILD_ARCH}}, io.hass.version=${{env.VERSION}}, io.hass.type=addon
+        build_args: BUILD_FROM=${{env.BUILD_FROM}}, BUILD_VERSION=${{env.VERSION}}
+        path: ./${{env.TARGET}}
+
+  armv7:
+    runs-on: ubuntu-latest
+    env:
+      BUILD_ARCH: armv7
+    steps:
+    - uses: actions/checkout@v2
+    - name: Add Qemu-user-static
+      run: docker run --rm --privileged hassioaddons/qemu-user-static:latest
+    - name: Set Version
+      if: github.event_name != 'workflow_dispatch'
+      run: |
+        version=${GITHUB_REF/refs\/tags\//}
+        if [ -n "$version" ];then
+          tmp=$(mktemp)
+          jq --arg version "$version" '.version=$version' ${{env.TARGET}}/config.json > "$tmp" && mv "$tmp" ${{env.TARGET}}/config.json
+        fi
+    - name: Get build option ${{env.BUILD_ARCH}}
+      run: |
+        echo ::set-env name=NAME::"$(jq --raw-output '.name // empty' "${{env.TARGET}}/config.json" | sed "s/'//g")"
+        echo ::set-env name=DESCRIPTION::"$(jq --raw-output '.description // empty' "${{env.TARGET}}/config.json" | sed "s/'//g")"
+        echo ::set-env name=URL::"$(jq --raw-output '.url // empty' "${{env.TARGET}}/config.json")"
+        echo ::set-env name=VERSION::"$(jq --raw-output '.version' "${{env.TARGET}}/config.json")"
+        echo ::set-env name=IMAGE::"$(echo "${{env.IMAGE}}" | sed -r "s/\{arch\}/${{env.BUILD_ARCH}}/g")"
+        echo ::set-env name=BUILD_FROM::"homeassistant/${{env.BUILD_ARCH}}-base:latest"
+        if [ "${{env.VERSION}}" != "dev" ]; then
+          echo ::set-env name=TAGS::"latest, $(jq --raw-output '.version' "${{env.TARGET}}/config.json")"
+        else
+          echo ::set-env name=TAGS::"$(jq --raw-output '.version' "${{env.TARGET}}/config.json")"
+        fi
+    - name: Debug Env
+      run: |
+        echo ${{env.IMAGE}}
+        echo ${{env.VERSION}}
+        echo ${{env.TAGS}}
+    - name: Build and push ${{env.BUILD_ARCH}}
       uses: docker/build-push-action@v1
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
