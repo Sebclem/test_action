@@ -25,7 +25,7 @@ jobs:
       run: docker run --rm --privileged hassioaddons/qemu-user-static:latest
     - name: Set Version
       run: |
-        version=$(${{GITHUB_REF/refs\/tags\//}})
+        version=${GITHUB_REF/refs\/tags\//}
         if [-n "$version"];then
           jq '.version="$version"' ${{env.TARGET}}/config.json |  sponge ${{env.TARGET}}/config.json
         fi
