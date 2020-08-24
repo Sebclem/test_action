@@ -15,7 +15,6 @@ env:
 jobs:
 
   build:
-
     runs-on: ubuntu-latest
     env:
       BUILD_ARCH: armv7
@@ -27,7 +26,8 @@ jobs:
       run: |
         version=${GITHUB_REF/refs\/tags\//}
         if [ -n "$version" ];then
-          jq '.version="$version"' ${{env.TARGET}}/config.json > ${{env.TARGET}}/config.json
+          tmp=$(mktemp)
+          jq '.version="$version"' ${{env.TARGET}}/config.json > "$tmp" && mv "$tmp" ${{env.TARGET}}/config.json
         fi
     - name: Get build option armv7
       run: |
