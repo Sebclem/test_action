@@ -17,10 +17,10 @@ jobs:
     env:
       BUILD_ARCH: armhf
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2
     
     - name: test-
-      uses: Sebclem/action_hassio_addon_builder@1.0.0
+      uses: Sebclem/action_hassio_addon_builder@master
 
 
 
