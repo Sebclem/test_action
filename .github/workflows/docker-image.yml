@@ -25,14 +25,16 @@ jobs:
       run: docker run --rm --privileged hassioaddons/qemu-user-static:latest
     - name: Set Version
       run: |
-        echo ${GITHUB_REF/refs\/tags\//}
-        echo ${GITHUB_REF}
+        version=$(${{GITHUB_REF/refs\/tags\//}})
+        if [-n "$version"];then
+          jq '.version="$version"' ${{env.TARGET}}/config.json |  sponge ${{env.TARGET}}/config.json
+        fi
     - name: Get build option armv7
       run: |
-        echo ::set-env name=NAME::"$(jq --raw-output '.name // empty' "$TARGET/config.json" | sed "s/'//g")"
-        echo ::set-env name=DESCRIPTION::"$(jq --raw-output '.description // empty' "$TARGET/config.json" | sed "s/'//g")"
-        echo ::set-env name=URL::"$(jq --raw-output '.url // empty' "$TARGET/config.json")"
-        echo ::set-env name=VERSION::"$(jq --raw-output '.version' "$TARGET/config.json")"
+        echo ::set-env name=NAME::"$(jq --raw-output '.name // empty' "${{env.TARGET}}/config.json" | sed "s/'//g")"
+        echo ::set-env name=DESCRIPTION::"$(jq --raw-output '.description // empty' "${{env.TARGET}}/config.json" | sed "s/'//g")"
+        echo ::set-env name=URL::"$(jq --raw-output '.url // empty' "${{env.TARGET}}/config.json")"
+        echo ::set-env name=VERSION::"$(jq --raw-output '.version' "${{env.TARGET}}/config.json")"
         echo ::set-env name=IMAGE::"$(echo "${{env.IMAGE}}" | sed -r "s/\{arch\}/${{env.BUILD_ARCH}}/g")"
         echo ::set-env name=BUILD_FROM::"homeassistant/${{env.BUILD_ARCH}}-base:latest"
     - name: Debug Env
