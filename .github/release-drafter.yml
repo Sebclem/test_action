@@ -1,0 +1,32 @@
+name-template: 'v$RESOLVED_VERSION 🌈'
+tag-template: 'v$RESOLVED_VERSION'
+categories:
+  - title: '🔨 Changes'
+    labels:
+      - ':hammer:'
+      - ':arrow_up:'
+      - ':heavy_plus_sign:'
+  - title: '✏ Enhancement'
+    labels:
+      - ':pencil2:'
+  - title: '🚑 Bug Fix'
+    labels: 
+      - 'fix'
+      - 'bugfix'
+      - 'bug'
+change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+version-resolver:
+  major:
+    labels:
+      - 'major'
+  minor:
+    labels:
+      - 'minor'
+  patch:
+    labels:
+      - 'patch'
+  default: patch
+template: |
+  ## Changes
+
+  $CHANGES
