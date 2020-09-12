@@ -6,7 +6,7 @@ updates:
 
   - package-ecosystem: "docker"
     # Look for a `Dockerfile` in the `root` directory
-    directory: "/"
+    directory: "/nextcloud_backup/"
     # Check for updates once a week
     schedule:
       interval: "daily"
