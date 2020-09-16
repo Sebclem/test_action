@@ -28,7 +28,7 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
     - name: Set Version
-      if: github.event_name != 'workflow_dispatch' || ithub.event_name != 'push'
+      if: github.event_name != 'workflow_dispatch' || github.event_name != 'push'
       run: |
         version=${GITHUB_REF/refs\/tags\//}
         if [ -n "$version" ];then
