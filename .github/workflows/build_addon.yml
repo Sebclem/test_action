@@ -43,6 +43,9 @@ jobs:
         echo ::set-env name=VERSION::"$(jq --raw-output '.version' "${{env.TARGET}}/config.json")"
         echo ::set-env name=IMAGE::"$(echo "${{env.IMAGE}}" | sed -r "s/\{arch\}/${{matrix.arch}}/g")"
         echo ::set-env name=BUILD_FROM::"homeassistant/${{matrix.arch}}-base:latest"
+        
+    - name: Set Tags ${{matrix.arch}}
+      run: |
         if [ "${{env.VERSION}}" != "dev" ]; then
           echo ::set-env name=TAGS::"${{env.REPOSITORY}}/${{env.IMAGE}}:latest, ${{env.REPOSITORY}}/${{env.IMAGE}}:$(jq --raw-output '.version' "${{env.TARGET}}/config.json")"
         else
