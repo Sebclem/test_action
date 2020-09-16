@@ -66,5 +66,5 @@ jobs:
         tags: ${{env.TAGS}}
         labels: io.hass.name=${{env.NAME}}, io.hass.description=${{env.DESCRIPTION}}, io.hass.url=${{env.URL}}, io.hass.arch=${{matrix.arch}}, io.hass.version=${{env.VERSION}}, io.hass.type=addon
         build_args: BUILD_FROM=${{env.BUILD_FROM}}, BUILD_VERSION=${{env.VERSION}}
-        path: ./${{env.TARGET}/Dockerfile}
+        path: ./${{env.TARGET}}/Dockerfile
 
