@@ -11,7 +11,7 @@
 ![Supports i386 Architecture][i386-shield]
 
 ![Project Maintenance][maintenance-shield]
-
+ 
 [![Community Forum][forum-shield]][forum]
 
 [![Buy me a coffee][buymeacoffee-shield]][buymeacoffee]
