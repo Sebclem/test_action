@@ -197,7 +197,7 @@ SOFTWARE.
 [project-stage-shield]: https://img.shields.io/badge/project%20stage-Beta-red.svg
 [reddit]: https://reddit.com/r/homeassistant
 [releases-shield]: https://img.shields.io/github/release/Sebclem/hassio-nextcloud-backup.svg?include_prereleases
-[releases]: https://github.com/Sebclem/hassio-nextcloud-backup/releases
+[releases]: https://github.com/Sebclem/hassio-nextcloud-backup/releases 
 [repository]: https://github.com/Sebclem/sebclem-hassio-addon-repository
 [contributors]: https://github.com/Sebclem/hassio-nextcloud-backup/graphs/contributors
 [semver]: https://semver.org/spec/v2.0.0.htm
