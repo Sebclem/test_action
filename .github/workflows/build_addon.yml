@@ -44,7 +44,7 @@ jobs:
     - name: Set Version Test ${{matrix.arch}}
       if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
       run: |
-        version=dev_${GITHUB_SHA}
+        version=dev_${GITHUB_RUN_ID}
         if [ -n "$version" ];then
           tmp=$(mktemp)
           jq --arg version "$version" '.version=$version' ${{env.TARGET}}/config.json > "$tmp" && mv "$tmp" ${{env.TARGET}}/config.json
